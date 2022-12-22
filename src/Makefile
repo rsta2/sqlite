@@ -2,7 +2,7 @@
 # Makefile
 #
 
-CIRCLESTDLIBHOME = ../../circle-stdlib
+CIRCLESTDLIBHOME = ../circle-stdlib
 
 include $(CIRCLESTDLIBHOME)/Config.mk
 
