@@ -16,20 +16,29 @@
 //
 #include "kernel.h"
 
-extern "C" int _main (int argc, const char **argv);
+extern "C"
+{
+        int myinit (void);
+        int mymain (int, const char **);
+};
 
 CKernel::CKernel (void)
-:	CStdlibAppStdio ("06-sqlite")
+:	CStdlibAppStdio ("sqlite")
 {
 	mActLED.Blink (5);	// show we are alive
 }
 
 CStdlibApp::TShutdownMode CKernel::Run (void)
 {
-        const char *pArgV[] = {GetKernelName (), nullptr};
-        int nResult = _main (1, pArgV);
+        if (myinit () != 0)
+        {
+                mLogger.Write (GetKernelName (), LogPanic, "myinit() failed");
+        }
 
-        mLogger.Write (GetKernelName (), LogNotice, "main() returned %d", nResult);
+        const char *pArgV[] = {GetKernelName (), nullptr};
+        int nResult = mymain (1, pArgV);
+
+        mLogger.Write (GetKernelName (), LogNotice, "mymain() returned %d", nResult);
 
 	return ShutdownHalt;
 }
