@@ -23,8 +23,8 @@
 #define SQLITE_HOME		"/sqlite"
 
 #define SQLITE_PID		1000
-#define SQLITE_UID		100
-#define SQLITE_GID		100
+#define SQLITE_UID		0
+#define SQLITE_GID		0
 
 #define SQLITE_MAX_PATH		512
 #define SQLITE_MAX_FILES	20
@@ -78,48 +78,6 @@ int myclose (int fd)
 	return close (fd);
 }
 
-int mystat (const char *pathname, struct stat *statbuf)
-{
-	assert (pathname);
-	FILINFO finfo;
-	FRESULT fr = f_stat (pathname, &finfo);
-	if (fr != FR_OK)
-	{
-		errno = ENOENT;
-
-		return -1;
-	}
-
-	assert (statbuf);
-	memset (statbuf, 0, sizeof statbuf);
-
-	statbuf->st_mode = 00444;
-	if (!(finfo.fattrib & AM_RDO))
-	{
-		statbuf->st_mode = 00200;
-	}
-
-	if (finfo.fattrib & AM_DIR)
-	{
-		statbuf->st_mode |= 0040111;
-	}
-	else
-	{
-		statbuf->st_mode |= 0100000;
-	}
-
-	statbuf->st_dev = 0x0101;
-	statbuf->st_ino = 1000;
-	statbuf->st_nlink = 1;
-	statbuf->st_uid = SQLITE_UID;
-	statbuf->st_gid = SQLITE_GID;
-	statbuf->st_size = finfo.fsize;
-	statbuf->st_blksize = 512;
-	statbuf->st_blocks = (finfo.fsize + 511) / 512;
-
-	return 0;
-}
-
 int myfstat (int fd, struct stat *statbuf)
 {
 	if (fd >= SQLITE_MAX_FILES)
@@ -129,7 +87,7 @@ int myfstat (int fd, struct stat *statbuf)
 		return -1;
 	}
 
-	return mystat (filename[fd], statbuf);
+	return stat (filename[fd], statbuf);
 }
 
 // There is no file record locking implemented.
@@ -301,13 +259,6 @@ unsigned sleep (unsigned seconds)
 	return 0;
 }
 
-// TODO: Cannot implement this currently, because f_sync()
-// needs the FIL file object, which is not available here.
-int fsync (int fd)
-{
-	return 0;
-}
-
 char *getcwd (char *buffer, size_t size)
 {
 	assert (buffer);
@@ -326,15 +277,6 @@ char *getcwd (char *buffer, size_t size)
 	}
 
 	return buffer;
-}
-
-// TODO: Cannot implement this currently, because f_truncate()
-// needs the FIL file object, which is not available here.
-int ftruncate (int fd, off_t length)
-{
-	printf ("Calling ftruncate (%d, %ld), which is not implemented.\n", fd, length);
-
-	return 0;
 }
 
 // Cannot change the file mode on an open file.

@@ -186,9 +186,7 @@ typedef unsigned char u8;
 
 #ifdef __circle__
 # define isatty myisatty
-# define stat(p, s) mystat(p, s)
-# define lstat(p, s) mystat(p, s)
-  extern int mystat (const char *, struct stat *);
+# define lstat(p, s) stat(p, s)
 # define main mymain
 #endif
 
