@@ -104,11 +104,6 @@ int myfcntl (int fd, int cmd, struct flock *lock)
 	return 0;
 }
 
-int myisatty (int fd)
-{
-	return fd <= 2 ? 1 : 0;
-}
-
 int access (const char *pathname, int mode)
 {
 	assert (pathname);

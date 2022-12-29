@@ -185,7 +185,6 @@ typedef unsigned char u8;
 #endif
 
 #ifdef __circle__
-# define isatty myisatty
 # define lstat(p, s) stat(p, s)
 # define main mymain
 #endif
