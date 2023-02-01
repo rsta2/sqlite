@@ -21,7 +21,6 @@ Building
 
 From project root:
 
-	patch -d circle-stdlib/libs/circle -p1 < circle.patch
 	cd circle-stdlib/
 	configure -r 4 -p aarch64-none-elf-	# for Raspberry Pi 4 64-bit
 	make -j

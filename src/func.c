@@ -19,7 +19,6 @@
 #include <fatfs/ff.h>
 #include <assert.h>
 
-#define SQLITE_DRIVE		"SD:"
 #define SQLITE_HOME		"/sqlite"
 
 #define SQLITE_PID		1000
@@ -33,8 +32,7 @@ static char filename[SQLITE_MAX_FILES][SQLITE_MAX_PATH+1];
 
 int myinit (void)
 {
-        if (   f_chdrive (SQLITE_DRIVE) != FR_OK
-	    || f_chdir (SQLITE_HOME) != FR_OK)
+        if (chdir (SQLITE_HOME) < 0)
 	{
 		printf ("Cannot chdir to %s.\n", SQLITE_HOME);
 
@@ -114,19 +112,6 @@ int access (const char *pathname, int mode)
 	        && (finfo.fattrib & AM_RDO)))
 	{
 		errno = EACCES;
-
-		return -1;
-	}
-
-	return 0;
-}
-
-int chdir (const char *pathname)
-{
-	assert (pathname);
-	if (f_chdir (pathname) != FR_OK)
-	{
-		errno = ENOENT;
 
 		return -1;
 	}
@@ -252,26 +237,6 @@ unsigned sleep (unsigned seconds)
 	}
 
 	return 0;
-}
-
-char *getcwd (char *buffer, size_t size)
-{
-	assert (buffer);
-	if (f_getcwd (buffer, size) != FR_OK)
-	{
-		errno = ENOENT;
-
-		return NULL;
-	}
-
-	// Ignore prefix (e.g. "SD:")
-	size_t len = strlen (SQLITE_DRIVE);
-	if (strncmp (buffer, SQLITE_DRIVE, len) == 0)
-	{
-		strcpy (buffer, buffer + len);
-	}
-
-	return buffer;
 }
 
 // Cannot change the file mode on an open file.
